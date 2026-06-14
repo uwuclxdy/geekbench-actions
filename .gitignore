@@ -1,0 +1,10 @@
+# Geekbench downloads / extracted builds / run outputs
+Geekbench-*-Linux/
+Geekbench-*-Mac/
+Geekbench*.app/
+Geekbench-*.tar.gz
+Geekbench-*.zip
+Geekbench-*WindowsSetup.exe
+geekbench.log
+result-url.txt
+result.json

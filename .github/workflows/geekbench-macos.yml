@@ -1,0 +1,24 @@
+name: Geekbench — macOS
+
+# Manual run of Geekbench on a GitHub-hosted macOS (Apple Silicon) runner.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Geekbench version
+        type: string
+        default: "6.7.1"
+      extra_args:
+        description: Extra geekbench6 CLI args
+        type: string
+        default: "--cpu"
+
+jobs:
+  macos:
+    uses: ./.github/workflows/_geekbench.yml
+    with:
+      os: macos-latest
+      version: ${{ inputs.version }}
+      extra_args: ${{ inputs.extra_args }}
+    secrets: inherit

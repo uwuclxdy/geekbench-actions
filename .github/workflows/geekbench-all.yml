@@ -1,0 +1,28 @@
+name: Geekbench — all platforms
+
+# Manual run of Geekbench across Linux, macOS and Windows in one click.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Geekbench version
+        type: string
+        default: "6.7.1"
+      extra_args:
+        description: Extra geekbench6 CLI args
+        type: string
+        default: "--cpu"
+
+jobs:
+  all:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    uses: ./.github/workflows/_geekbench.yml
+    with:
+      os: ${{ matrix.os }}
+      version: ${{ inputs.version }}
+      extra_args: ${{ inputs.extra_args }}
+    secrets: inherit

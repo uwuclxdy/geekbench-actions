@@ -1,0 +1,144 @@
+name: Geekbench (reusable)
+
+# Reusable core: download + run Geekbench on one runner OS, then publish the
+# result URL and logs. Triggered only via workflow_call from the dispatch
+# wrappers (geekbench-linux/macos/windows/all). Not runnable on its own.
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: Runner label to execute on (e.g. ubuntu-latest)
+        type: string
+        required: true
+      version:
+        description: Geekbench version to download
+        type: string
+        default: "6.7.1"
+      extra_args:
+        description: Extra args passed to the geekbench6 CLI (e.g. --cpu)
+        type: string
+        default: "--cpu"
+    secrets:
+      GEEKBENCH_EMAIL:
+        description: Geekbench Pro license email (optional; unlocks JSON export)
+        required: false
+      GEEKBENCH_KEY:
+        description: Geekbench Pro license key (optional)
+        required: false
+
+jobs:
+  benchmark:
+    name: ${{ inputs.os }}
+    runs-on: ${{ inputs.os }}
+    timeout-minutes: 30
+    env:
+      VERSION: ${{ inputs.version }}
+      EXTRA_ARGS: ${{ inputs.extra_args }}
+      GB_EMAIL: ${{ secrets.GEEKBENCH_EMAIL }}
+      GB_KEY: ${{ secrets.GEEKBENCH_KEY }}
+    steps:
+      - name: Run Geekbench (Linux / macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            asset="Geekbench-${VERSION}-Linux.tar.gz"
+          else
+            asset="Geekbench-${VERSION}-Mac.zip"
+          fi
+          url="https://cdn.geekbench.com/${asset}"
+
+          echo "Downloading $url"
+          curl -fSL --retry 3 -o "$asset" "$url"
+
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            tar xzf "$asset"
+          else
+            unzip -q "$asset"
+          fi
+
+          # Launcher is named exactly `geekbench6` on both the Linux tarball and
+          # inside the macOS .app bundle; it resolves the right arch itself.
+          bin="$(find . -type f -name geekbench6 | head -n1)"
+          if [ -z "$bin" ]; then
+            echo "::error::geekbench6 binary not found after extraction"; exit 1
+          fi
+          chmod +x "$bin" || true
+          echo "Using $bin"
+          "$bin" --version || true
+
+          args="$EXTRA_ARGS"
+          if [ -n "${GB_KEY:-}" ]; then
+            echo "Unlocking Geekbench Pro"
+            "$bin" --unlock "$GB_EMAIL" "$GB_KEY"
+            args="$args --export-json result.json"
+          fi
+
+          # shellcheck disable=SC2086
+          "$bin" $args 2>&1 | tee geekbench.log
+
+      - name: Run Geekbench (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $asset = "Geekbench-$env:VERSION-WindowsSetup.exe"
+          $url   = "https://cdn.geekbench.com/$asset"
+
+          Write-Host "Downloading $url"
+          Invoke-WebRequest -Uri $url -OutFile $asset
+
+          # Geekbench ships an Inno Setup installer; run it unattended.
+          Write-Host "Installing silently"
+          Start-Process -FilePath ".\$asset" `
+            -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait
+
+          $roots = @($env:ProgramFiles, ${env:ProgramFiles(x86)}) | Where-Object { $_ }
+          $bin = Get-ChildItem -Path $roots -Recurse -Filter geekbench6.exe `
+            -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $bin) {
+            Write-Error "geekbench6.exe not found after install"; exit 1
+          }
+          Write-Host "Using $($bin.FullName)"
+          & $bin.FullName --version
+
+          $gbArgs = @($env:EXTRA_ARGS.Split(' ', [StringSplitOptions]::RemoveEmptyEntries))
+          if ($env:GB_KEY) {
+            Write-Host "Unlocking Geekbench Pro"
+            & $bin.FullName --unlock $env:GB_EMAIL $env:GB_KEY
+            $gbArgs += @('--export-json', 'result.json')
+          }
+
+          & $bin.FullName @gbArgs 2>&1 | Tee-Object -FilePath geekbench.log
+
+      - name: Publish result URL
+        if: always()
+        shell: bash
+        run: |
+          url="$(grep -Eo 'https://browser\.geekbench\.com/[A-Za-z0-9/_-]+' geekbench.log 2>/dev/null | tail -n1 || true)"
+          printf '%s\n' "$url" > result-url.txt
+          {
+            echo "## Geekbench ${VERSION} — ${RUNNER_OS}"
+            echo
+            echo "- args: \`${EXTRA_ARGS}\`"
+            if [ -n "$url" ]; then
+              echo "- result: $url"
+            else
+              echo "- result: _no browser URL captured — see the geekbench.log artifact_"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload logs and results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: geekbench-${{ inputs.os }}
+          path: |
+            geekbench.log
+            result-url.txt
+            result.json
+          if-no-files-found: warn
+          retention-days: 30
