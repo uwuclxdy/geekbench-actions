@@ -86,22 +86,18 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $asset = "Geekbench-$env:VERSION-WindowsSetup.exe"
+          # Use the portable Windows zip (no installer) to mirror the Unix flow.
+          $asset = "Geekbench-$env:VERSION-Windows.zip"
           $url   = "https://cdn.geekbench.com/$asset"
 
           Write-Host "Downloading $url"
           Invoke-WebRequest -Uri $url -OutFile $asset
+          Expand-Archive -Path $asset -DestinationPath gb -Force
 
-          # Geekbench ships an Inno Setup installer; run it unattended.
-          Write-Host "Installing silently"
-          Start-Process -FilePath ".\$asset" `
-            -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait
-
-          $roots = @($env:ProgramFiles, ${env:ProgramFiles(x86)}) | Where-Object { $_ }
-          $bin = Get-ChildItem -Path $roots -Recurse -Filter geekbench6.exe `
-            -ErrorAction SilentlyContinue | Select-Object -First 1
+          $bin = Get-ChildItem -Path gb -Recurse -Filter geekbench6.exe |
+            Select-Object -First 1
           if (-not $bin) {
-            Write-Error "geekbench6.exe not found after install"; exit 1
+            Write-Error "geekbench6.exe not found in archive"; exit 1
           }
           Write-Host "Using $($bin.FullName)"
           & $bin.FullName --version

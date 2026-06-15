@@ -4,7 +4,7 @@ Geekbench-*-Mac/
 Geekbench*.app/
 Geekbench-*.tar.gz
 Geekbench-*.zip
-Geekbench-*WindowsSetup.exe
+gb/
 geekbench.log
 result-url.txt
 result.json

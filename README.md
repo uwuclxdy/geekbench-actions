@@ -53,6 +53,6 @@ When both secrets are present, the workflow authenticates and passes `--export-j
 
 ## Notes
 
-**Version bumps:** set the `version` input at run time. No file edits needed as long as the CDN keeps the `Geekbench-<version>-{Linux.tar.gz,Mac.zip,WindowsSetup.exe}` naming pattern.
+**Version bumps:** set the `version` input at run time. No file edits needed as long as the CDN keeps the `Geekbench-<version>-{Linux.tar.gz,Mac.zip,Windows.zip}` naming pattern.
 
-**Windows installer:** Geekbench is installed via the official Inno Setup installer with `/VERYSILENT`. If a future release changes its silent-install flags, update the Windows step in `_geekbench.yml`.
+**No installers:** every platform downloads and extracts a portable build (the official `Geekbench-<version>-Windows.zip` on Windows), so no admin install step is needed and the three jobs share the same flow.
