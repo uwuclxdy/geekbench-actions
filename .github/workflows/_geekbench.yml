@@ -118,13 +118,13 @@ jobs:
           url="$(grep -Eo 'https://browser\.geekbench\.com/[A-Za-z0-9/_-]+' geekbench.log 2>/dev/null | tail -n1 || true)"
           printf '%s\n' "$url" > result-url.txt
           {
-            echo "## Geekbench ${VERSION} — ${RUNNER_OS}"
+            echo "## Geekbench ${VERSION} (${RUNNER_OS})"
             echo
             echo "- args: \`${EXTRA_ARGS}\`"
             if [ -n "$url" ]; then
               echo "- result: $url"
             else
-              echo "- result: _no browser URL captured — see the geekbench.log artifact_"
+              echo "- result: _no browser URL captured; see the geekbench.log artifact_"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 

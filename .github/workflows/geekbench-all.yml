@@ -1,4 +1,4 @@
-name: Geekbench — all platforms
+name: Geekbench (all platforms)
 
 # Manual run of Geekbench across Linux, macOS and Windows in one click.
 # Wrapper around _geekbench.yml; see each job summary for the result URL.

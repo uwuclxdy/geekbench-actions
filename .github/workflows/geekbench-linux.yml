@@ -1,4 +1,4 @@
-name: Geekbench — Linux
+name: Geekbench (Linux)
 
 # Manual run of Geekbench on a GitHub-hosted Ubuntu runner.
 # Wrapper around _geekbench.yml; see the run summary for the result URL.

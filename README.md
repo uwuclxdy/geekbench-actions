@@ -1,15 +1,15 @@
 # geekbench-actions
 
-Run [Geekbench 6](https://www.geekbench.com/) CPU benchmarks on GitHub-hosted runners, on demand. Every workflow is manual-only (`workflow_dispatch`) — no benchmarks run on push or schedule. Each run downloads the official Geekbench build from `cdn.geekbench.com`, runs it, and posts the result URL to the run summary. Logs and the result URL are saved as downloadable artifacts.
+Run [Geekbench 6](https://www.geekbench.com/) CPU benchmarks on GitHub-hosted runners, on demand. Every workflow is manual-only (`workflow_dispatch`), so nothing runs on push or schedule. Each run downloads the official Geekbench build from `cdn.geekbench.com`, runs it, and posts the result URL to the run summary. Logs and the result URL are saved as downloadable artifacts.
 
 ## Workflows
 
 | Workflow | File | Runner |
 |---|---|---|
-| Geekbench — Linux | `geekbench-linux.yml` | `ubuntu-latest` |
-| Geekbench — macOS | `geekbench-macos.yml` | `macos-latest` (Apple Silicon) |
-| Geekbench — Windows | `geekbench-windows.yml` | `windows-latest` |
-| Geekbench — all platforms | `geekbench-all.yml` | matrix of all three |
+| Geekbench (Linux) | `geekbench-linux.yml` | `ubuntu-latest` |
+| Geekbench (macOS) | `geekbench-macos.yml` | `macos-latest` (Apple Silicon) |
+| Geekbench (Windows) | `geekbench-windows.yml` | `windows-latest` |
+| Geekbench (all platforms) | `geekbench-all.yml` | matrix of all three |
 
 `_geekbench.yml` is a shared reusable core (`workflow_call`). The four listed workflows call it and are not run directly.
 
@@ -34,9 +34,9 @@ After a run completes:
 
 - The **run summary** shows a `https://browser.geekbench.com/...` link.
 - The artifact `geekbench-<os>` contains:
-  - `geekbench.log` — full CLI output
-  - `result-url.txt` — the result URL
-  - `result.json` — Pro license only (see below)
+  - `geekbench.log`: full CLI output
+  - `result-url.txt`: the result URL
+  - `result.json`: Pro license only (see below)
 
 Artifacts are kept for 30 days.
 

@@ -1,4 +1,4 @@
-name: Geekbench — Windows
+name: Geekbench (Windows)
 
 # Manual run of Geekbench on a GitHub-hosted Windows runner.
 # Wrapper around _geekbench.yml; see the run summary for the result URL.
