@@ -1,66 +1,58 @@
 # geekbench-actions
 
-Run [Geekbench 6](https://www.geekbench.com/) CPU benchmarks on GitHub-hosted
-runners, on demand. Every workflow is manual-only (`workflow_dispatch`) — nothing
-runs on push. Each run downloads the official Geekbench build, runs it, uploads
-the result to the Geekbench Browser, and surfaces the result URL in the run
-summary plus a downloadable log artifact.
+Run [Geekbench 6](https://www.geekbench.com/) CPU benchmarks on GitHub-hosted runners, on demand. Every workflow is manual-only (`workflow_dispatch`) — no benchmarks run on push or schedule. Each run downloads the official Geekbench build from `cdn.geekbench.com`, runs it, and posts the result URL to the run summary. Logs and the result URL are saved as downloadable artifacts.
 
 ## Workflows
 
-| Workflow | Runner | Trigger |
+| Workflow | File | Runner |
 |---|---|---|
-| **Geekbench — Linux** | `ubuntu-latest` | manual |
-| **Geekbench — macOS** | `macos-latest` (Apple Silicon) | manual |
-| **Geekbench — Windows** | `windows-latest` | manual |
-| **Geekbench — all platforms** | matrix of all three | manual |
-| `_geekbench.yml` | — | reusable core (`workflow_call`), not run directly |
+| Geekbench — Linux | `geekbench-linux.yml` | `ubuntu-latest` |
+| Geekbench — macOS | `geekbench-macos.yml` | `macos-latest` (Apple Silicon) |
+| Geekbench — Windows | `geekbench-windows.yml` | `windows-latest` |
+| Geekbench — all platforms | `geekbench-all.yml` | matrix of all three |
 
-The four named workflows are thin wrappers that call the shared
-`_geekbench.yml`, so the download/run/report logic lives in one place.
+`_geekbench.yml` is a shared reusable core (`workflow_call`). The four listed workflows call it and are not run directly.
 
-## Running
+## How to run
 
-1. Open the **Actions** tab.
-2. Pick a workflow (e.g. *Geekbench — Linux*) → **Run workflow**.
-3. Optionally override the inputs, then confirm.
+1. Go to the **Actions** tab.
+2. Pick a workflow, click **Run workflow**.
+3. Override inputs if needed, then confirm.
 
 ### Inputs
 
-| Input | Default | Notes |
+| Input | Default | Description |
 |---|---|---|
-| `version` | `6.7.1` | Geekbench version pulled from `cdn.geekbench.com`. |
-| `extra_args` | `--cpu` | Passed verbatim to the `geekbench6` CLI. |
+| `version` | `6.7.1` | Geekbench version to download. |
+| `extra_args` | `--cpu` | Args passed verbatim to the `geekbench6` CLI. |
 
-Useful `extra_args` values: `--cpu` (default), `--cpu --multi-core`, or any flag
-the Geekbench CLI accepts. GPU compute is omitted because hosted runners have no
-dedicated GPU.
+`extra_args` accepts any flag the CLI supports. GPU benchmarks are not available on hosted runners, so stick to `--cpu` or `--cpu --multi-core`.
 
 ## Results
 
-- **Run summary** shows the `https://browser.geekbench.com/...` result URL.
-- **Artifacts** (`geekbench-<os>`) contain:
+After a run completes:
+
+- The **run summary** shows a `https://browser.geekbench.com/...` link.
+- The artifact `geekbench-<os>` contains:
   - `geekbench.log` — full CLI output
-  - `result-url.txt` — the captured result URL
-  - `result.json` — only when a Pro license is configured (see below)
+  - `result-url.txt` — the result URL
+  - `result.json` — Pro license only (see below)
 
-## Optional: Geekbench Pro license
+Artifacts are kept for 30 days.
 
-The free CLI must upload results to the Geekbench Browser. Add a Pro license to
-also export results as JSON locally (`result.json` artifact). Set these repo
-secrets (Settings → Secrets and variables → Actions):
+## Geekbench Pro license (optional)
+
+Without a license, results are uploaded to the Geekbench Browser but not exported locally. With one, each run also writes `result.json`.
+
+To enable, add two repository secrets under **Settings → Secrets and variables → Actions**:
 
 - `GEEKBENCH_EMAIL`
 - `GEEKBENCH_KEY`
 
-When both are present, each run unlocks Pro and adds `--export-json result.json`.
+When both secrets are present, the workflow authenticates and passes `--export-json result.json` to the CLI automatically.
 
 ## Notes
 
-- The Windows job installs Geekbench from the official Inno Setup installer
-  (`/VERYSILENT`) and locates `geekbench6.exe` under Program Files. If a future
-  Geekbench installer changes its silent-install flags, adjust the Windows step
-  in `_geekbench.yml`.
-- To benchmark a newer release, set the `version` input — no file edits needed,
-  as long as the CDN asset names keep the
-  `Geekbench-<version>-{Linux.tar.gz,Mac.zip,WindowsSetup.exe}` pattern.
+**Version bumps:** set the `version` input at run time. No file edits needed as long as the CDN keeps the `Geekbench-<version>-{Linux.tar.gz,Mac.zip,WindowsSetup.exe}` naming pattern.
+
+**Windows installer:** Geekbench is installed via the official Inno Setup installer with `/VERYSILENT`. If a future release changes its silent-install flags, update the Windows step in `_geekbench.yml`.

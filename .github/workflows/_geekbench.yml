@@ -3,6 +3,7 @@ name: Geekbench (reusable)
 # Reusable core: download + run Geekbench on one runner OS, then publish the
 # result URL and logs. Triggered only via workflow_call from the dispatch
 # wrappers (geekbench-linux/macos/windows/all). Not runnable on its own.
+# Results: browser.geekbench.com URL in the run summary + log artifacts.
 
 on:
   workflow_call:
