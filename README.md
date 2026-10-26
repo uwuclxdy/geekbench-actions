@@ -30,6 +30,16 @@ Run [Geekbench 7](https://www.geekbench.com/) CPU benchmarks on GitHub-hosted ru
 
 ## Results
 
+Two runs per platform on 2026-10-26, all Geekbench 7.0.0. Shared hosted runners move a lot between runs — macOS multi-core came back 3438 then 7712 — so each cell is the range over those runs, not a fixed score.
+
+| Workflow | Runner | CPU | Single-core | Multi-core | Latest result |
+|---|---|---|---|---|---|
+| Geekbench (Linux) | `ubuntu-latest`, Ubuntu 24.04.5 LTS | AMD EPYC 7763, 2 cores / 4 threads | 1477–1503 | 3343–3397 | [`730025`](https://browser.geekbench.com/v7/cpu/730025) |
+| Geekbench (macOS) | `macos-latest`, macOS 26.6.2 | Apple M2 Pro (virtual), 5 cores | 1435–1952 | 3438–7712 | [`730010`](https://browser.geekbench.com/v7/cpu/730010) |
+| Geekbench (Windows) | `windows-latest`, Windows Server 2025 Datacenter | AMD EPYC 7763, 2 cores / 4 threads | 1435–2153 | 3106–5299 | [`730030`](https://browser.geekbench.com/v7/cpu/730030) |
+
+The scores live only on that Geekbench Browser page; `geekbench.log` carries the system and CPU block and the upload lines, not the numbers.
+
 After a run completes:
 
 - The **run summary** shows a `https://browser.geekbench.com/...` link.
