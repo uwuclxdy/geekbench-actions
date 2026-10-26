@@ -1,6 +1,6 @@
 # geekbench-actions
 
-Run [Geekbench 6](https://www.geekbench.com/) CPU benchmarks on GitHub-hosted runners, on demand. Every workflow is manual-only (`workflow_dispatch`), so nothing runs on push or schedule. Each run downloads the official Geekbench build from `cdn.geekbench.com`, runs it, and posts the result URL to the run summary. Logs and the result URL are saved as downloadable artifacts.
+Run [Geekbench 7](https://www.geekbench.com/) CPU benchmarks on GitHub-hosted runners, on demand. Every workflow is manual-only (`workflow_dispatch`), so nothing runs on push or schedule. Each run downloads the official Geekbench build from `cdn.geekbench.com`, runs it, and posts the result URL to the run summary. Logs and the result URL are saved as downloadable artifacts.
 
 ## Workflows
 
@@ -23,8 +23,8 @@ Run [Geekbench 6](https://www.geekbench.com/) CPU benchmarks on GitHub-hosted ru
 
 | Input | Default | Description |
 |---|---|---|
-| `version` | `6.7.1` | Geekbench version to download. |
-| `extra_args` | `--cpu` | Args passed verbatim to the `geekbench6` CLI. |
+| `version` | `7.0.0` | Geekbench version to download. |
+| `extra_args` | `--cpu` | Args passed verbatim to the Geekbench CLI. |
 
 `extra_args` accepts any flag the CLI supports. GPU benchmarks are not available on hosted runners, so stick to `--cpu` or `--cpu --multi-core`.
 
@@ -53,6 +53,8 @@ When both secrets are present, the workflow authenticates and passes `--export-j
 
 ## Notes
 
-**Version bumps:** set the `version` input at run time. No file edits needed as long as the CDN keeps the `Geekbench-<version>-{Linux.tar.gz,Mac.zip,Windows.zip}` naming pattern.
+**Version bumps:** set the `version` input at run time. No file edits are needed as long as the CDN keeps the `Geekbench-<version>-{Linux.tar.gz,Mac.zip,Windows.zip}` naming pattern and the launcher inside the archive stays `geekbench<major>` — as it is for 6 and 7.
+
+**Requirements:** Geekbench 7 asks for Ubuntu 22.04+, macOS 15+ or Windows 11+ ([download page](https://www.geekbench.com/download/)).
 
 **No installers:** every platform downloads and extracts a portable build (the official `Geekbench-<version>-Windows.zip` on Windows), so no admin install step is needed and the three jobs share the same flow.

@@ -9,9 +9,9 @@ on:
       version:
         description: Geekbench version
         type: string
-        default: "6.7.1"
+        default: "7.0.0"
       extra_args:
-        description: Extra geekbench6 CLI args
+        description: Extra Geekbench CLI args
         type: string
         default: "--cpu"
 

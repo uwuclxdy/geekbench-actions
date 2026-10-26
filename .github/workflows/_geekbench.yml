@@ -15,9 +15,9 @@ on:
       version:
         description: Geekbench version to download
         type: string
-        default: "6.7.1"
+        default: "7.0.0"
       extra_args:
-        description: Extra args passed to the geekbench6 CLI (e.g. --cpu)
+        description: Extra args passed to the Geekbench CLI (e.g. --cpu)
         type: string
         default: "--cpu"
     secrets:
@@ -61,11 +61,12 @@ jobs:
             unzip -q "$asset"
           fi
 
-          # Launcher is named exactly `geekbench6` on both the Linux tarball and
+          # Launcher is named `geekbench<major>` on both the Linux tarball and
           # inside the macOS .app bundle; it resolves the right arch itself.
-          bin="$(find . -type f -name geekbench6 | head -n1)"
+          launcher="geekbench${VERSION%%.*}"
+          bin="$(find . -type f -name "$launcher" | head -n1)"
           if [ -z "$bin" ]; then
-            echo "::error::geekbench6 binary not found after extraction"; exit 1
+            echo "::error::$launcher not found after extraction"; exit 1
           fi
           chmod +x "$bin" || true
           echo "Using $bin"
@@ -94,10 +95,11 @@ jobs:
           Invoke-WebRequest -Uri $url -OutFile $asset
           Expand-Archive -Path $asset -DestinationPath gb -Force
 
-          $bin = Get-ChildItem -Path gb -Recurse -Filter geekbench6.exe |
+          $launcher = "geekbench$($env:VERSION.Split('.')[0]).exe"
+          $bin = Get-ChildItem -Path gb -Recurse -Filter $launcher |
             Select-Object -First 1
           if (-not $bin) {
-            Write-Error "geekbench6.exe not found in archive"; exit 1
+            Write-Error "$launcher not found in archive"; exit 1
           }
           Write-Host "Using $($bin.FullName)"
           & $bin.FullName --version
