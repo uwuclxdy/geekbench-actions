@@ -24,9 +24,9 @@ Run [Geekbench 7](https://www.geekbench.com/) CPU benchmarks on GitHub-hosted ru
 | Input | Default | Description |
 |---|---|---|
 | `version` | `7.0.0` | Geekbench version to download. |
-| `extra_args` | `--cpu` | Args passed to the Geekbench CLI, split on whitespace (no shell quoting). |
+| `extra_args` | `--cpu` | Args passed to the Geekbench CLI, split into words; quoting does not survive. |
 
-`extra_args` accepts any flag the CLI supports. GPU benchmarks are not available on hosted runners, so stick to `--cpu` or `--cpu --multi-core`.
+`extra_args` accepts any flag the CLI supports; it is split into words rather than parsed as shell input, and on Linux and macOS globs expand. GPU benchmarks are not available on hosted runners, so stick to `--cpu` or `--cpu --multi-core`.
 
 ## Results
 

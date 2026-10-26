@@ -22,10 +22,10 @@ on:
         default: "--cpu"
     secrets:
       GEEKBENCH_EMAIL:
-        description: Geekbench Pro license email (optional; unlocks JSON export)
+        description: Geekbench Pro license email (optional; set both to unlock the JSON export)
         required: false
       GEEKBENCH_KEY:
-        description: Geekbench Pro license key (optional)
+        description: Geekbench Pro license key (optional; set both to unlock the JSON export)
         required: false
 
 jobs:
