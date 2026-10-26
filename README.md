@@ -24,7 +24,7 @@ Run [Geekbench 7](https://www.geekbench.com/) CPU benchmarks on GitHub-hosted ru
 | Input | Default | Description |
 |---|---|---|
 | `version` | `7.0.0` | Geekbench version to download. |
-| `extra_args` | `--cpu` | Args passed verbatim to the Geekbench CLI. |
+| `extra_args` | `--cpu` | Args passed to the Geekbench CLI, split on whitespace (no shell quoting). |
 
 `extra_args` accepts any flag the CLI supports. GPU benchmarks are not available on hosted runners, so stick to `--cpu` or `--cpu --multi-core`.
 
@@ -49,7 +49,7 @@ To enable, add two repository secrets under **Settings → Secrets and variables
 - `GEEKBENCH_EMAIL`
 - `GEEKBENCH_KEY`
 
-When both secrets are present, the workflow authenticates and passes `--export-json result.json` to the CLI automatically.
+When both secrets are present, the workflow authenticates and passes `--export-json result.json` to the CLI automatically. Setting only one of the two warns and skips the JSON export.
 
 ## Notes
 

@@ -64,7 +64,7 @@ jobs:
           # Launcher is named `geekbench<major>` on both the Linux tarball and
           # inside the macOS .app bundle; it resolves the right arch itself.
           launcher="geekbench${VERSION%%.*}"
-          bin="$(find . -type f -name "$launcher" | head -n1)"
+          bin="$(find . -type f -name "$launcher" | sed -n '1p')"
           if [ -z "$bin" ]; then
             echo "::error::$launcher not found after extraction"; exit 1
           fi
@@ -73,10 +73,12 @@ jobs:
           "$bin" --version || true
 
           args="$EXTRA_ARGS"
-          if [ -n "${GB_KEY:-}" ]; then
+          if [ -n "${GB_KEY:-}" ] && [ -n "${GB_EMAIL:-}" ]; then
             echo "Unlocking Geekbench Pro"
             "$bin" --unlock "$GB_EMAIL" "$GB_KEY"
             args="$args --export-json result.json"
+          elif [ -n "${GB_KEY:-}" ] || [ -n "${GB_EMAIL:-}" ]; then
+            echo "::warning::Geekbench Pro needs both GEEKBENCH_EMAIL and GEEKBENCH_KEY; skipping the JSON export"
           fi
 
           # shellcheck disable=SC2086
@@ -105,10 +107,16 @@ jobs:
           & $bin.FullName --version
 
           $gbArgs = @($env:EXTRA_ARGS.Split(' ', [StringSplitOptions]::RemoveEmptyEntries))
-          if ($env:GB_KEY) {
+          if ($env:GB_KEY -and $env:GB_EMAIL) {
             Write-Host "Unlocking Geekbench Pro"
             & $bin.FullName --unlock $env:GB_EMAIL $env:GB_KEY
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "Geekbench Pro unlock failed with exit code $LASTEXITCODE"; exit 1
+            }
             $gbArgs += @('--export-json', 'result.json')
+          }
+          elseif ($env:GB_KEY -or $env:GB_EMAIL) {
+            Write-Host "::warning::Geekbench Pro needs both GEEKBENCH_EMAIL and GEEKBENCH_KEY; skipping the JSON export"
           }
 
           & $bin.FullName @gbArgs 2>&1 | Tee-Object -FilePath geekbench.log
