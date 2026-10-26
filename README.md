@@ -30,13 +30,16 @@ Run [Geekbench 7](https://www.geekbench.com/) CPU benchmarks on GitHub-hosted ru
 
 ## Results
 
-Two runs per platform on 2026-10-26, all Geekbench 7.0.0. Shared hosted runners move a lot between runs — macOS multi-core came back 3438 then 7712 — so each cell is the range over those runs, not a fixed score.
+Two runs of each workflow on 2026-10-26, all Geekbench 7.0.0. The runner label does not pin the hardware: 22 minutes apart, `macos-latest` handed out an Apple M1 with 3 cores and then an M2 Pro with 5, and `windows-latest` an EPYC 9V45 and then an EPYC 7763. The scores follow the CPU, so read each row on its own — a runner label's score is not reproducible from one run to the next.
 
-| Workflow | Runner | CPU | Single-core | Multi-core | Latest result |
+| Workflow | Runner | CPU the runner handed out | Single-core | Multi-core | Result |
 |---|---|---|---|---|---|
-| Geekbench (Linux) | `ubuntu-latest`, Ubuntu 24.04.5 LTS | AMD EPYC 7763, 2 cores / 4 threads | 1477–1503 | 3343–3397 | [`730025`](https://browser.geekbench.com/v7/cpu/730025) |
-| Geekbench (macOS) | `macos-latest`, macOS 26.6.2 | Apple M2 Pro (virtual), 5 cores | 1435–1952 | 3438–7712 | [`730010`](https://browser.geekbench.com/v7/cpu/730010) |
-| Geekbench (Windows) | `windows-latest`, Windows Server 2025 Datacenter | AMD EPYC 7763, 2 cores / 4 threads | 1435–2153 | 3106–5299 | [`730030`](https://browser.geekbench.com/v7/cpu/730030) |
+| Geekbench (Linux) | `ubuntu-latest`, Ubuntu 24.04.5 LTS | AMD EPYC 7763, 2 cores / 4 threads | 1477 | 3343 | [`729863`](https://browser.geekbench.com/v7/cpu/729863) |
+| Geekbench (Linux) | `ubuntu-latest`, Ubuntu 24.04.5 LTS | AMD EPYC 7763, 2 cores / 4 threads | 1503 | 3397 | [`730025`](https://browser.geekbench.com/v7/cpu/730025) |
+| Geekbench (macOS) | `macos-latest`, macOS 26.6.2 | Apple M1 (virtual), 3 cores | 1435 | 3438 | [`729866`](https://browser.geekbench.com/v7/cpu/729866) |
+| Geekbench (macOS) | `macos-latest`, macOS 26.6.2 | Apple M2 Pro (virtual), 5 cores | 1952 | 7712 | [`730010`](https://browser.geekbench.com/v7/cpu/730010) |
+| Geekbench (Windows) | `windows-latest`, Windows Server 2025 Datacenter | AMD EPYC 9V45, 2 cores / 4 threads | 2153 | 5299 | [`729849`](https://browser.geekbench.com/v7/cpu/729849) |
+| Geekbench (Windows) | `windows-latest`, Windows Server 2025 Datacenter | AMD EPYC 7763, 2 cores / 4 threads | 1435 | 3106 | [`730030`](https://browser.geekbench.com/v7/cpu/730030) |
 
 The scores live only on that Geekbench Browser page; `geekbench.log` carries the system and CPU block and the upload lines, not the numbers.
 
