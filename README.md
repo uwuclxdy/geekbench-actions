@@ -30,7 +30,7 @@ Run [Geekbench 7](https://www.geekbench.com/) CPU benchmarks on GitHub-hosted ru
 
 ## Results
 
-Two runs of each workflow on 2026-10-26, all Geekbench 7.0.0. The runner label does not pin the hardware: 22 minutes apart, `macos-latest` handed out an Apple M1 with 3 cores and then an M2 Pro with 5, and `windows-latest` an EPYC 9V45 and then an EPYC 7763. The scores follow the CPU, so read each row on its own — a runner label's score is not reproducible from one run to the next.
+Two runs of each workflow on 2026-10-26, all Geekbench 7.0.0. Which CPU a runner label hands out does not follow from the label: `macos-latest` gave an Apple M1 with 3 cores and, 22 minutes later, an M2 Pro with 5; `windows-latest` an EPYC 9V45 and then an EPYC 7763. Both `ubuntu-latest` runs drew the same EPYC 7763 and agreed within 2%. Read each row as the CPU that run was handed, not as a score the label owns.
 
 | Workflow | Runner | CPU the runner handed out | Single-core | Multi-core | Result |
 |---|---|---|---|---|---|
